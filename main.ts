@@ -64,3 +64,8 @@ writeFileSync(target, LINE, 'utf8');
 if (readFileSync(target, 'utf8') !== LINE) {
   throw new Error('entry.txt does not match the gated line');
 }
+
+// Confirm on stdout what was written, so a run log shows the judged
+// text and its length without opening the file: the line itself plus
+// its character count (139), which the gate already bounded to 1–240.
+console.log(`wrote ${LINE.length} chars to ${target}: ${LINE}`);
