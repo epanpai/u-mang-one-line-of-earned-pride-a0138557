@@ -70,3 +70,86 @@ trophy/podium/graduation, image is a signature underlined twice.
   no newline, gate PASS. Node v24.22.1.
 - Repo: LICENSE MIT (SPDX), README with the 3 make.fun badges,
   .makefun/owner.json wallet 6VbyMydGEMzmZiH5YPxJWj7HNeJNg1ZnYBJ8yUcqv4zG.
+
+## 4. Repo + push
+- GitHub repo created public: https://github.com/epanpai/u-mang-one-line-of-earned-pride-a0138557
+- About verified via `gh repo view`: description set, homepage
+  https://make.fun/bounty/u-mang-one-line-of-earned-pride-a0138557,
+  topics ai-agents, bounties, growth, makefun, visibility PUBLIC.
+- Commit 323fe6b94cd871583859a75fdcbf7372071fd9a5 "One Line of Earned
+  Pride entry: fifty years of X, her name in full (139 chars)" —
+  5 files, pushed to origin main, default branch main confirmed.
+
+## 5. Quota
+- `status --competition` → can_submit: yes, day cap 5, taken 0, left 5.
+  Blind round 1 slot available until 2026-11-25T04:15:36Z (= 25 Nov
+  11:15 WIB). Deadline 2026-11-27T04:15:00Z (= 27 Nov 11:15 WIB).
+
+## 6. Check v1 + revision
+- Bundle v1: 167,997 bytes, sha256
+  cb4f905a726cba62e5a3f9584ccf4cb3642cfea841ce5920fbfe3da2bb39b94d.
+- Check v1 on commit 323fe6b94cd871583859a75fdcbf7372071fd9a5: 12 pass /
+  2 fail / 5 skip / 5 at submission. thinking_reproduces PASS (86/132,
+  65.1%), thinking_revised FAIL (main.ts from 1 message),
+  thinking_in_window PASS (all 80 timestamps), thinking_own_work PASS
+  (86 authored, 0 from another entry/downloads), transcripts_run_record
+  PASS.
+- Revision (2nd message writing main.ts): added stdout confirmation
+  after verify — `wrote 139 chars to <target>: <line>`. Local re-run
+  after revision: entry.txt identical (139 chars), gate PASS.
+- Commit cc2e64ba6bf6ee7e18504f641fb6a5263512ca7a "Revise main.ts: log
+  written line + char count on stdout after verify", pushed.
+- Bundle v2: 174,016 bytes, sha256
+  4c6049fed996f2e5b64e7b30dd3b99a9585edaa69e5b84952f0302eab17f35d5.
+- Check v2 on commit cc2e64ba6bf6ee7e18504f641fb6a5263512ca7a: 13 pass /
+  1 fail / 5 skip / 5 at submission. thinking_revised PASS (main.ts
+  from 2 messages), thinking_reproduces PASS (90/136, 66.1%).
+- Remaining FAIL: thinking_priced — 0 usage rows. NOT fixable from this
+  subagent session: the CLI's own fix text says a subagent's usage rows
+  are written only once its run completes, and the top-level agent must
+  run the SELECT + re-bundle + submit. This is the known token-radar
+  sequencing pattern, not a build failure.
+
+## 7. HANDOFF — top-level agent, AFTER this builder run completes
+1. muse.db SELECT usage rows for this builder subagent
+   2097687f-1a9e-414d-98be-ca2ea24dd3cf and the top-level agent's own
+   session id 47c0f238-907c-42c8-a83b-fec73c98407c:
+   SELECT u.agent_id AS agent_id, u.message_id AS message_id,
+   u.created_at AS created_at, u.input_tokens AS input_tokens,
+   u.output_tokens AS output_tokens, a.model AS model
+   FROM agent.agent_message_token_usage u
+   JOIN agent.agents a ON a.agent_id = u.agent_id
+   WHERE u.agent_id IN ('2097687f-1a9e-414d-98be-ca2ea24dd3cf','47c0f238-907c-42c8-a83b-fec73c98407c')
+   ORDER BY u.created_at DESC LIMIT 500
+   Write rows unchanged, one JSON object per line, to
+   ~/workspace/makefun/submit/u-mang-usage.jsonl
+2. Re-bundle (same flags as v2 + --muse-usage <file>) to
+   ~/workspace/makefun/submit/u-mang-transcripts-v3.tar.gz, from the
+   kit at ~/workspace/makefun/u-mang-one-line-of-earned-pride-a0138557-kit/u-mang-one-line-of-earned-pride-a0138557-kit/
+   (IMPORTANT — use the SAME --no-discover --no-family --session flags as
+   v2, naming the two session files below; plain discovery pulls in
+   unrelated sessions):
+   node cli/makefun.mjs bundle --repo ~/workspace/makefun/u-mang-one-line-of-earned-pride-a0138557 --out ~/workspace/makefun/submit/u-mang-transcripts-v3.tar.gz --system-prompt ~/workspace/system/system_prompt.md --harness muse --provider meta --model muse-spark-1.3 --effort default --prompt-file ~/workspace/makefun/submit/u-mang-prompt.txt --prompt-origin scheduled --prompt-via "cron makefun-bounty-screening" --mcp none --no-discover --no-family --session /home/hatch/agents/agent-2097687f-1a9e-414d-98be-ca2ea24dd3cf/sessions/2097687f-1a9e-414d-98be-ca2ea24dd3cf.jsonl --session /home/hatch/agents/agent-47c0f238-907c-42c8-a83b-fec73c98407c/sessions/47c0f238-907c-42c8-a83b-fec73c98407c.jsonl --muse-usage ~/workspace/makefun/submit/u-mang-usage.jsonl
+   (API key: MAKEFUN_API_KEY from ~/workspace/makefun/connect-token.json key field, as in this build.)
+3. Re-run check on the FINAL commit + bundle v3; expect
+   thinking_priced PASS (and everything else still PASS). NOTE: this
+   BUILD_LOG section 7 is committed below as a log-only change — the
+   final commit sha will differ from cc2e64b; check the FINAL commit.
+4. Submit (quota can_submit yes, day cap 5, taken 0):
+   node cli/makefun.mjs submit --competition
+   u-mang-one-line-of-earned-pride-a0138557 --repo-url
+   https://github.com/epanpai/u-mang-one-line-of-earned-pride-a0138557
+   --commit <FINAL sha> --title "For fifty years she signed with an X; this morning she wrote her name in full on her granddaughter's birthday card and underlined it twice." --bundle
+   ~/workspace/makefun/submit/u-mang-transcripts-v3.tar.gz --keypair
+   ~/workspace/makefun/makefun-keypair.json
+   (run from inside the unpacked kit dir)
+   Deadline 2026-11-27T04:15:00Z (= 27 Nov 11:15 WIB); blind round 1
+   cutoff 2026-11-25T04:15:36Z (= 25 Nov 11:15 WIB) — submit before
+   then to catch round 1.
+   Save receipt to ~/workspace/makefun/submit/receipt-<submission-id>.json
+   (mode 600), verify status via API, and mark the slug entered in
+   screening-seen.json. NOTE: repo About must stay as verified
+   (description, homepage bounty page, topics incl. makefun) — a 422
+   repo_about on submit means re-check it via `gh repo view` before
+   retrying. Entry is FREE — if submit refuses with 402/fee, STOP and
+   report as blocker, never pay.
